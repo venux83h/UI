@@ -17,34 +17,34 @@
 local a a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()return{
 
 
-Primary=Color3.fromHex"#0091FF",
+Primary=Color3.fromHex"#7C9CFF",
 
 White=Color3.new(1,1,1),
 Black=Color3.new(0,0,0),
 
 Dialog="Accent",
 
-Background="Accent",
-BackgroundTransparency=0,
+Background=Color3.fromHex"#0F1220",
+BackgroundTransparency=0.02,
 Hover="Text",
 
 WindowBackground="Background",
 
-WindowShadow="Black",
+WindowShadow=Color3.fromHex"#000000",
 
 
-WindowTopbarTitle="Text",
-WindowTopbarAuthor="Text",
+WindowTopbarTitle=Color3.fromHex"#E6EBFF",
+WindowTopbarAuthor=Color3.fromHex"#AAB2FF",
 WindowTopbarIcon="Icon",
 WindowTopbarButtonIcon="Icon",
 
 WindowSearchBarBackground="Background",
 
-TabBackground="Hover",
+TabBackground=Color3.fromHex"#161A2E",
 TabTitle="Text",
 TabIcon="Icon",
 
-ElementBackground="Text",
+ElementBackground=Color3.fromHex"#1B2140",
 ElementTitle="Text",
 ElementDesc="Text",
 ElementIcon="Icon",
@@ -74,19 +74,19 @@ SliderThumb="White",
 SliderIconFrom=Color3.fromHex"#908F95",
 SliderIconTo=Color3.fromHex"#908F95",
 
-Tooltip=Color3.fromHex"4C4C4C",
+Tooltip=Color3.fromHex"1E2242",
 TooltipText="White",
 TooltipSecondary="Primary",
 TooltipSecondaryText="White",
 
-SectionBox="White",
+SectionBox=Color3.fromHex"#2A3166",
 SectionBoxTransparency=.95,
 SectionBoxBorder="White",
 SectionBoxBorderTransparency=.75,
 SectionBoxBackground="White",
 SectionBoxBackgroundTransparency=.95,
 
-SearchBarBorder="White",
+SearchBarBorder=Color3.fromHex"#2A3166",
 SearchBarBorderTransparency=.75,
 
 NotificationDuration="White",
@@ -7932,7 +7932,7 @@ Size=UDim2.fromOffset(160,158),
 Position=UDim2.fromOffset(0,40+aw.TextPadding),
 Image="rbxassetid://4155801252",
 BackgroundColor3=Color3.fromHSV(az,1,1),
-BackgroundTransparency=0,
+BackgroundTransparency=0.02,
 Parent=ay.UIElements.Main,
 },{
 ae("UICorner",{
@@ -8039,7 +8039,7 @@ aD,
 local aE=ae("Frame",{
 BackgroundColor3=aw.Default,
 Size=UDim2.fromScale(1,1),
-BackgroundTransparency=0,
+BackgroundTransparency=0.02,
 ZIndex=9,
 },{
 ae("UICorner",{
