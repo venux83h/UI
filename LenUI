@@ -1,0 +1,54 @@
+-- lenUI v1.2 FULL (WindUI-inspired)
+
+local lenUI = {}
+lenUI.__index = lenUI
+
+-- SERVICES
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- THEME
+local Theme = {
+    Background = Color3.fromRGB(22,22,22),
+    Panel = Color3.fromRGB(30,30,30),
+    Accent = Color3.fromRGB(0,120,255),
+    Text = Color3.fromRGB(255,255,255),
+    Muted = Color3.fromRGB(120,120,120)
+}
+
+-- DRAG
+local function MakeDraggable(top, frame)
+    local dragging, dragInput, mousePos, framePos
+    top.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            mousePos = i.Position
+            framePos = frame.Position
+        end
+    end)
+    top.InputChanged:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = i
+        end
+    end)
+    UIS.InputChanged:Connect(function(i)
+        if i == dragInput and dragging then
+            local delta = i.Position - mousePos
+            frame.Position = UDim2.new(
+                framePos.X.Scale,
+                framePos.X.Offset + delta.X,
+                framePos.Y.Scale,
+                framePos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+end
+
+-- NOTIFY
+local function Notify(gui, text)
