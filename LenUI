@@ -1,54 +1,263 @@
--- lenUI v1.2 FULL (WindUI-inspired)
+local lenUI={}
+lenUI.__index=lenUI
 
-local lenUI = {}
-lenUI.__index = lenUI
+local UIS=game:GetService("UserInputService")
+local TweenService=game:GetService("TweenService")
 
--- SERVICES
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-
--- THEME
-local Theme = {
-    Background = Color3.fromRGB(22,22,22),
-    Panel = Color3.fromRGB(30,30,30),
-    Accent = Color3.fromRGB(0,120,255),
-    Text = Color3.fromRGB(255,255,255),
-    Muted = Color3.fromRGB(120,120,120)
+local Theme={
+Background=Color3.fromRGB(22,22,22),
+Panel=Color3.fromRGB(30,30,30),
+Accent=Color3.fromRGB(0,120,255),
+Text=Color3.fromRGB(255,255,255),
+Muted=Color3.fromRGB(120,120,120)
 }
 
--- DRAG
-local function MakeDraggable(top, frame)
-    local dragging, dragInput, mousePos, framePos
-    top.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            mousePos = i.Position
-            framePos = frame.Position
-        end
-    end)
-    top.InputChanged:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = i
-        end
-    end)
-    UIS.InputChanged:Connect(function(i)
-        if i == dragInput and dragging then
-            local delta = i.Position - mousePos
-            frame.Position = UDim2.new(
-                framePos.X.Scale,
-                framePos.X.Offset + delta.X,
-                framePos.Y.Scale,
-                framePos.Y.Offset + delta.Y
-            )
-        end
-    end)
-    UIS.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
+local function Drag(top,frame)
+local d,di,mp,fp
+top.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 then
+d=true mp=i.Position fp=frame.Position
+end
+end)
+top.InputChanged:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseMovement then di=i end
+end)
+UIS.InputChanged:Connect(function(i)
+if i==di and d then
+local delta=i.Position-mp
+frame.Position=UDim2.new(fp.X.Scale,fp.X.Offset+delta.X,fp.Y.Scale,fp.Y.Offset+delta.Y)
+end
+end)
+UIS.InputEnded:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 then d=false end
+end)
 end
 
--- NOTIFY
-local function Notify(gui, text)
+function lenUI:CreateWindow(cfg)
+local Window={}
+local enabled=true
+
+local gui=Instance.new("ScreenGui",game.CoreGui)
+gui.ResetOnSpawn=false
+gui.Name="lenUI"
+
+local main=Instance.new("Frame",gui)
+main.Size=cfg.Size or UDim2.fromOffset(600,420)
+main.Position=UDim2.fromScale(0.5,0.5)
+main.AnchorPoint=Vector2.new(0.5,0.5)
+main.BackgroundColor3=Theme.Background
+main.BorderSizePixel=0
+
+local top=Instance.new("Frame",main)
+top.Size=UDim2.new(1,0,0,40)
+top.BackgroundColor3=Theme.Panel
+top.BorderSizePixel=0
+
+local title=Instance.new("TextLabel",top)
+title.Size=UDim2.new(1,-90,1,0)
+title.Position=UDim2.fromOffset(10,0)
+title.Text=cfg.Title or "lenUI"
+title.TextColor3=Theme.Text
+title.Font=Enum.Font.GothamBold
+title.TextSize=16
+title.TextXAlignment=Enum.TextXAlignment.Left
+title.BackgroundTransparency=1
+
+local toggleBg=Instance.new("Frame",top)
+toggleBg.Size=UDim2.fromOffset(40,18)
+toggleBg.Position=UDim2.new(1,-55,0.5,-9)
+toggleBg.BackgroundColor3=Theme.Background
+toggleBg.BorderSizePixel=0
+Instance.new("UICorner",toggleBg).CornerRadius=UDim.new(1,0)
+
+local toggle=Instance.new("Frame",toggleBg)
+toggle.Size=UDim2.fromOffset(14,14)
+toggle.Position=UDim2.fromOffset(22,2)
+toggle.BackgroundColor3=Theme.Accent
+toggle.BorderSizePixel=0
+Instance.new("UICorner",toggle).CornerRadius=UDim.new(1,0)
+
+toggleBg.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 then
+enabled=not enabled
+TweenService:Create(toggle,TweenInfo.new(0.25),{
+Position=enabled and UDim2.fromOffset(22,2) or UDim2.fromOffset(2,2),
+BackgroundColor3=enabled and Theme.Accent or Theme.Muted
+}):Play()
+TweenService:Create(main,TweenInfo.new(0.25),{
+Size=enabled and (cfg.Size or UDim2.fromOffset(600,420)) or UDim2.fromOffset(main.Size.X.Offset,40)
+}):Play()
+end
+end)
+
+Drag(top,main)
+
+local tabs=Instance.new("Frame",main)
+tabs.Size=UDim2.new(0,150,1,-40)
+tabs.Position=UDim2.fromOffset(0,40)
+tabs.BackgroundColor3=Theme.Panel
+tabs.BorderSizePixel=0
+
+local tabLayout=Instance.new("UIListLayout",tabs)
+tabLayout.Padding=UDim.new(0,6)
+
+local pages=Instance.new("Frame",main)
+pages.Size=UDim2.new(1,-150,1,-40)
+pages.Position=UDim2.fromOffset(150,40)
+pages.BackgroundTransparency=1
+
+function Window:CreateTab(name)
+local Tab={}
+
+local tb=Instance.new("TextButton",tabs)
+tb.Size=UDim2.new(1,-10,0,32)
+tb.Position=UDim2.fromOffset(5,0)
+tb.Text=name
+tb.BackgroundColor3=Theme.Background
+tb.TextColor3=Theme.Text
+tb.Font=Enum.Font.Gotham
+tb.TextSize=14
+tb.BorderSizePixel=0
+
+local page=Instance.new("ScrollingFrame",pages)
+page.Size=UDim2.new(1,0,1,0)
+page.ScrollBarImageTransparency=1
+page.Visible=false
+page.AutomaticCanvasSize=Enum.AutomaticSize.Y
+
+local pl=Instance.new("UIListLayout",page)
+pl.Padding=UDim.new(0,6)
+
+tb.MouseButton1Click:Connect(function()
+for _,v in pairs(pages:GetChildren()) do
+if v:IsA("ScrollingFrame") then v.Visible=false end
+end
+page.Visible=true
+end)
+
+function Tab:AddButton(text,cb)
+local b=Instance.new("TextButton",page)
+b.Size=UDim2.new(1,-10,0,32)
+b.Text=text
+b.BackgroundColor3=Theme.Panel
+b.TextColor3=Theme.Text
+b.Font=Enum.Font.Gotham
+b.TextSize=14
+b.BorderSizePixel=0
+b.MouseButton1Click:Connect(cb)
+end
+
+function Tab:AddToggle(text,def,cb)
+local state=def or false
+local b=Instance.new("TextButton",page)
+b.Size=UDim2.new(1,-10,0,32)
+b.Text=text
+b.BackgroundColor3=state and Theme.Accent or Theme.Panel
+b.TextColor3=Theme.Text
+b.Font=Enum.Font.Gotham
+b.TextSize=14
+b.BorderSizePixel=0
+b.MouseButton1Click:Connect(function()
+state=not state
+b.BackgroundColor3=state and Theme.Accent or Theme.Panel
+cb(state)
+end)
+end
+
+function Tab:AddSlider(text,min,max,def,cb)
+local f=Instance.new("Frame",page)
+f.Size=UDim2.new(1,-10,0,40)
+f.BackgroundColor3=Theme.Panel
+f.BorderSizePixel=0
+
+local l=Instance.new("TextLabel",f)
+l.Size=UDim2.new(1,0,0,18)
+l.Text=text
+l.TextColor3=Theme.Text
+l.Font=Enum.Font.Gotham
+l.TextSize=13
+l.BackgroundTransparency=1
+
+local bar=Instance.new("Frame",f)
+bar.Size=UDim2.new(1,-10,0,6)
+bar.Position=UDim2.fromOffset(5,26)
+bar.BackgroundColor3=Theme.Background
+bar.BorderSizePixel=0
+
+local fill=Instance.new("Frame",bar)
+fill.Size=UDim2.fromScale((def-min)/(max-min),1)
+fill.BackgroundColor3=Theme.Accent
+fill.BorderSizePixel=0
+
+bar.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 then
+local p=math.clamp((UIS:GetMouseLocation().X-bar.AbsolutePosition.X)/bar.AbsoluteSize.X,0,1)
+fill.Size=UDim2.fromScale(p,1)
+cb(math.floor(min+(max-min)*p))
+end
+end)
+end
+
+function Tab:AddTextbox(ph,cb)
+local b=Instance.new("TextBox",page)
+b.Size=UDim2.new(1,-10,0,32)
+b.PlaceholderText=ph
+b.Text=""
+b.BackgroundColor3=Theme.Panel
+b.TextColor3=Theme.Text
+b.Font=Enum.Font.Gotham
+b.TextSize=14
+b.BorderSizePixel=0
+b.FocusLost:Connect(function()
+cb(b.Text)
+end)
+end
+
+function Tab:AddDropdown(text,list,cb)
+local open=false
+local mainB=Instance.new("TextButton",page)
+mainB.Size=UDim2.new(1,-10,0,32)
+mainB.Text=text
+mainB.BackgroundColor3=Theme.Panel
+mainB.TextColor3=Theme.Text
+mainB.Font=Enum.Font.Gotham
+mainB.TextSize=14
+mainB.BorderSizePixel=0
+
+local holder=Instance.new("Frame",page)
+holder.Size=UDim2.new(1,-10,0,0)
+holder.BackgroundTransparency=1
+holder.ClipsDescendants=true
+
+local hl=Instance.new("UIListLayout",holder)
+
+mainB.MouseButton1Click:Connect(function()
+open=not open
+TweenService:Create(holder,TweenInfo.new(0.25),{
+Size=open and UDim2.new(1,-10,0,#list*30) or UDim2.new(1,-10,0,0)
+}):Play()
+end)
+
+for _,v in pairs(list) do
+local o=Instance.new("TextButton",holder)
+o.Size=UDim2.new(1,0,0,28)
+o.Text=v
+o.BackgroundColor3=Theme.Background
+o.TextColor3=Theme.Text
+o.Font=Enum.Font.Gotham
+o.TextSize=13
+o.BorderSizePixel=0
+o.MouseButton1Click:Connect(function()
+mainB.Text=text..": "..v
+cb(v)
+end)
+end
+end
+
+return Tab
+end
+
+return Window
+end
+
+return lenUI
